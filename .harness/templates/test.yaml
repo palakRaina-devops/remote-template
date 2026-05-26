@@ -1,0 +1,19 @@
+template:
+  name: echo testing
+  type: Step
+  spec:
+    type: ShellScript
+    timeout: 10m
+    spec:
+      shell: Bash
+      executionTarget: {}
+      delegateSelectors:
+        - "<+<+org.identifier> == \"default\" ? \"kubernetes-delegate\" : <+pipeline.variables.delegateSelector>>"
+      source:
+        type: Inline
+        spec:
+          script: echo "Testing"
+      environmentVariables: []
+      outputVariables: []
+  identifier: echo_testing
+  versionLabel: "1"

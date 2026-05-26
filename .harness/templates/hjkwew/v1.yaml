@@ -1,0 +1,342 @@
+template:
+  name: Gatling Testing
+  identifier: CD_Stage_Gatling_Test
+  versionLabel: v1.x.x
+  type: Stage
+  description: Gatling Performance tests using Gradle and reports will be published to GCS bucket.
+  tags:
+    owning_platform: Everyday Banking Platform
+    owning_lab: EDB-DevOps Team - Run & Change Lab
+    snow_group: IT.DIGITAL.EDB
+    documentation_link: https://lbg.atlassian.net/wiki/x/-p7iJg
+    deprecation_date: live
+    expiry_date: live
+  icon: data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAAAAAAAD/4QAuRXhpZgAATU0AKgAAAAgAAkAAAAMAAAABADUAAEABAAEAAAABAAAAAAAAAAD/2wBDAAoHBwkHBgoJCAkLCwoMDxkQDw4ODx4WFxIZJCAmJSMgIyIoLTkwKCo2KyIjMkQyNjs9QEBAJjBGS0U+Sjk/QD3/2wBDAQsLCw8NDx0QEB09KSMpPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT3/wAARCAFtAdoDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD2WiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKz7i/kZjFZR+bIOGYnCL9T3+gqJTUVdlKLZeLBVJYgD1qnLrFlCSGuFJHZef5VUOiS3Z3X127/7CcLUo8PWIH3GP1auaU8RL4IpLzNoxox+OTfoJ/wkdl/ek/74pV8Q2LHBkK/VTTZPDlk4+UOh9Q1Z114amQFreQOB2bg1zzqY6Gtk15G8IYSel2vU34b63uP9VMjewNT5rgnjlgkKuGjcdjwa0bHXbi2IWYmWP36j8aijmi5uWqrFVMvdr03c6ylqvaXkV5EJIWBB/Sp69WMlJXT0PPaadmLSUdBVG41i1tyQWLEdlUmlOpGC952HGMpO0UX6Kxm8TWyn/VS/iuKT/hJ7b/nnJ+VYfXaH8yNfqtb+U2qSsyLxBZSnBcof9oVoRypMoaN1dT3BrWFaFT4WmZzpzh8SsSUUUVqQFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAQyoZfkyVXuR1PtT441jQKihVHQAU+ilZXuO4lBNUb7V7ax+Vm3Sf3F5P/wBasl/FEpP7uBQP9o1y1cbRpu0mbU8LVqK8VodLmkJrn4fE/IE8GB3KHNbNtdxXcW+FwR7VdHFUqvwPUVShUp/Eht5Yw30W2VeezDqK5G+sZLCfZJyp+63r/wDXrt6q6hYrfWrRt97qp9DXPjcHGtHmirSNcLipUpWexyNneS2M4kiP+8p6MK7Gzuo7y2WaM8Ecg9q4iSNo5GRxh1OCPSp7PUbiw3CBlAbqCM15WDxjw7cZ7fqejisKqyUo7ncU3av90Vyn/CQ3/wDej/74o/4SG/8A70f/AHxXpf2pQ7M4f7PreR1DW8Ugw8aMPcVn3Xh+0nBMa+U3Yr0/Ksb/AISC+/vR/wDfH/16lt/EV15y+cEZCcEAYIqHjcLV92S/AuOFxFPWL/EpX2nT2D4lXKHo46f/AK6hguZrVg8EjKfY8V3EsSTxFJVDKw5Brj9V042E+BkxP9wnt7Vx4vByw/7ym3b8jpw2KVb3Ki1/M3tL1pL7EcuEmx07N9K1ea4BTsIZCQwOQR2rSXxBfKoG+M47la3w+aJRtV3XUxr5e73p7HXUVm6NqLahAxkUCRDg46GtKvXpVI1YKUdmebODhJxlugooorQkKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAENZmt6j9httsZ/fScL7e9alcfr0pl1WQHogCiuHH13SpNx3Z1YOkqtRJ7IzySxLMSWJ5JNJRRXzB9AHWp7S7lspxJEeehHZqkstMub7mJML/fbpWivhiXHNwoPstdVHDV3adNPyexzVa9FXjNif8JNcf88Y/wAzR/wk1z/zxj/M07/hF5P+flf++aP+EXk/5+F/75rttmHn+By3wX9XMm8uvtdy0xQIzDkLUHetLUtGbT4BKZd4JxgDFZvavNrwnCbVRWb1O6jKEopw2Nu00CO6tY5RcMA4zjb0qb/hF1x/x8t/3zUOl63DZWSQypIWUnkCrg8TWo/5Zy/lXq0o4JwTla9tTzqksWpNRvYh/wCEWX/n5b/vmpbfw1DFKryStJtOQMYp3/CTW3/POX8qP+Emtv8AnnL+VaqOATTTRnJ4tqzubHtVTUrNb2zeMj5sZU+hqj/wk1r/AM85fyrUt7iO6iWSFtyNXaqtKunBNM5XTqUmpNWOFwVYgjBHBFPgjWS4jR2IVm25AqfVohDqk6gYBbP581VBIYEdQcivl5R5Kji9bM+gjLngmuqO0sNPi0+HZHkk8sT3q3WKniW2AUOkgPc4rXhlSeNZI2DKwyDX1FCrSkuWm1ofPVoVE+aotySiiiukyCiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigArjdciMeqy56OA1djWRr2nG7gEsQzLH2/vD0rgzCi6tF8u6OvB1VTq67M5armlWRv7wI2fLUZeqYrU0fUodPEvmqxLkcqK8DDKDqr2jsj2cQ5qm+RXZ1SRrEgRFCqBwAKfWN/wk1r/AHJPyqS212C5nWKOOUsfbgV9LHF0G1GMkeDLD1Um5JmrRRRXSYmJ4ncCzjXuz1zA6VteJLkPeJCDxGMn6msavl8wmp4h29D38FFxoq/qWoNNu7mMPFAWU9wRUn9jX4/5dm/MV0unmK2soo2ljyqjPzDrVn7RD/z1T/voV3U8touKcpa211OOePqptJaHI/2Nf/8APs35ij+xr/8A59m/MV132mH/AJ6p/wB9ClWaNjhXVj7GrWV0Okn95P1+quiOP/sbUP8An3b8xXSaRZPY2QjkOXJLHHbNX6XtXTh8DToS5ovUwrYudaPLI5DXyDq8mOyrn8qzasX0wuL+eQdCxA+lRQr5kqJx8zAc189WfPVk11Z7VJclJX6ItLo99JgiA4PqRXUabatZ2UcLnJA5xVlMeWoU8AY4p3P4V9DhcFCg+aLu2eJXxU63uvZC0UUV3HMFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRUcknlfM33e59KerBgCCCD3FK6vYLGXf6FBeEun7uU9SOh+orJfw5eIflMbj1ziurorjq4CjVd2tfI6aeLq01ZPQ5iDw1NIR50iIvovJrcstPhsI9sI5PVj1NWuaO1XRwdGjrFak1cTUq6SegtVr27WztnlfoOg9TTrm6itITJM4VR6965HUtSfUJsnKxr91fT3+tZ4zFxoRsviexeFwzrS8kVpZWmleVzlnOTUZz2qa1tZLycQxLlj1Pp9a6+00yC2t1iMauR1Zh1NeJhsJPEty2Xc9WviYUEo2uzi/lo+Wu6+x2//ADwj/wC+RR9jt/8AnhH/AN8iuz+yJ/zHN/aUf5ThePQVLaGQXMfk58zcMbf89K7X7Hb/APPCP/vkU6O3iiOUiRT6gCqhlUoyTcyZZimmuUkGcDNZmuX4tLQop/eyDaB6D1qfUNShsIi0hy5HyoOprkbq6kvJ2llOSegHYV0Y/GRpR5IvVmODwzqS5pLREBpeKtWFhJfzhIxhQfmf0/8Ar11kOnW0MSxiJCFHUgZrysNgZ4hOV7Lv3PQxGMhRajuzP8NGU2sm/Pl7vkzW3TQAgAAAHoKdX0VCl7KmoXvY8WrP2k3K1rhRRRWxmFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFACGqE1pNCfMsmA7mJ/un6elaFFRKKkilKxlDXUibZewyW7e4yD+NWBrFiwyLlPx4qzJCkqFZEDqexFUJfD9jKciMof9k1zyWJj8DTXmbRdGXxJr0Hvrdig/14PsBms+68SjBW2jJPZn4/Spv+EYtf8AnpL+YpP+EZt/+esv51zT+vTVlZG0PqkXd3Zz1xdS3Um6aQse3tSQxxvIBLKI17kjNdH/AMIxa/8APWX8xR/wjFt/z1l/MVwf2diHLmlZ+rOz67RUeWN18htlqGlWEW2KQ57nacmrP9v2H/PU/wDfJqD/AIRi2/56y/nR/wAIzbf89ZfzFd8frkElGMUjjf1aTu27lj+37D/nqf8Avk0f2/Yf89T/AN8mq/8AwjFt/wA9ZfzFH/CMW3/PWX8xVc2N7IVsJ3ZLJ4iskHDM59AtZt14llkBW2Tywf4m5NXf+EYtv+esv5ik/wCEZtv+esv51nUWOmraIuEsJB31ZzbyPK5eRi7nqSaSun/4Ri1/56S/mKcPDdn6yH/gVcP9mYhu7sdf1+itFcyLfXZbZAkcEKqOgGRVkeKJh963Q/QmtBfDtiOqOfqxqQaFYD/ljn6k12Qw+NirKaSOaVbCt35WUE8Ur/HbsPo1XrTXLa7kEaiRXPQFamXSrJPu20Y/CrKQpGMIgUewrrpU8SmueSfyOapOg17kWvmPooortOYKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKralcmz025uAMtFGzD6gUAUtU8S6bo7+XdT/vcZ8tBuP/1qh0/xfpOoziGOdo5GOFWVdufpXlckr3EjzTMXkkO5mJzkmm//AKxjtVWI5me5UVj+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tqk3Ts93Zj9nCPOmumhPbR2y6xcOk7tMR80Z6CppdYs4WkR5cNGcMMGqdnz4kvP90f0ptjEkniG9ZgCVxjIojVkklC13JoJU4ttyd7JM0rPUIL4HyHyR1UjBFJd6nbWJCzPhj2Ayaz4UWPxS6oAoMfIHrUdkI5Nfu/tIUyA/IG9Paq+sVLKOl72uL2EE2+lrmjFq9nM0apLlpDhRir1c/epAniG08oKGJ+cLXQCtsPUlPmUraPoZVqcYKLj1XUWiiiukxCiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAKWo6bHqAQSOy7DkbaqL4eiUg/aZ+Dn71bFFYSw9OcuaS1NY1qkVyp6FG+0qG92sxZJE6OpwRUVposNtMJnkkllHQuc4rSpafsKblzW1Eqs1HlvoUr/TYtQVRJlWXlWU4IqmfD0LL+8mmdsjDMeRWzSUpYenN80lqONapFWTK93ZRXlv5MoyoHB7iqA8PQkFZJ5pBjABbpWxSGnPD05u8kKNacVaLIra3W2t0iUkqgwCalpaK0SSSSIbbdynb6fHBeTXCsxaXqD0FNvtMiv9rMWSRejqcEVdoqHRg4uNtClUknzX1M600eK2m853eaUDAZznFLeaRHdzCZXeKUDG5D1rRoqfq9Pl5baD9rPm5r6lCx0uOyZ33PJK/V3OTT7fT47e7muFZi0vUHtVuimqMIpJLYTqSbbvuVItPSG/lugzF5Bgg9BRBp6QX09yrMWl6g9BVulpqlBW08xc8n1KQsE/tL7ZubeV247Vm6t9lN+i3cUkeRxOjYz7Gt6mvGkgw6qw9CM1nVoKUXGNlrcunVcZJvtY5u0hgl1i3+whmji+aSRucn8a6Xv2xTUjSIYRFUewxT6eHo+yTXVhWq+0a8haKKK6DIKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigD//Z
+  spec:
+    type: Custom
+    spec:
+      execution:
+        steps:
+          - stepGroup:
+              name: StepGroup_CI_StepGroup_OIDC_Token_Generation
+              identifier: StepGroup_CI_StepGroup_OIDC_Token_Generation
+              template:
+                templateRef: account.CD_StepGroup_OIDC_Token_Generation
+                versionLabel: v2.0.1
+                templateInputs:
+                  variables:
+                    - name: ENVIRONMENT_ID
+                      type: String
+                      value: <+input>.default(pre).allowedValues(pre,prod,rtl,int)
+                    - name: GCP_SERVICE_ACCOUNT_EMAIL
+                      type: String
+                      value: <+input>.regex(^[ \t\r\n]*[A-Za-z0-9][A-Za-z0-9._%+\-]*@[a-z][a-z0-9\-]*[.]iam[.]gserviceaccount[.]com[ \t\r\n]*$)
+                    - name: CREATE_CRED_FILE
+                      type: String
+                      value: <+input>.default(false).allowedValues(false,true)
+            contextType: StageTemplate
+          - stepGroup:
+              name: Gatling Test
+              identifier: Gatling_Test
+              steps:
+                - step:
+                    type: GitClone
+                    name: Git Clone
+                    identifier: Git_Clone
+                    spec:
+                      connectorRef: account.github_enterprise_cloud_green
+                      repoName: <+input>
+                      cloneDirectory: /harness/
+                      build: <+input>
+                - step:
+                    type: Run
+                    name: Gradle Init
+                    identifier: Gradle_Init
+                    spec:
+                      connectorRef: account.gcp_rtl_ssv_gar_ro_gsa
+                      image: europe-docker.pkg.dev/ssv-rtl-devops-registry-624/release/docker.io/gradle:<+stage.variables.GRADLE_VERSION>
+                      shell: Sh
+                      command: |-
+                        #!/bin/sh
+
+                        if [ "<+stage.variables.NEXUS_REGISTRY_VERSION>" = "staging" ]; then
+                            NEXUS_SNAPSHOT_REPOSITORY_URL="https://artefacts.lloydsbanking.cloud/repository/<+stage.variables.NEXUS_REGISTRY_VISIBILITY>-<+org.identifier>_<+project.identifier>-maven-snapshot-staging"
+                            NEXUS_RELEASE_REPOSITORY_URL="https://artefacts.lloydsbanking.cloud/repository/<+stage.variables.NEXUS_REGISTRY_VISIBILITY>-<+org.identifier>_<+project.identifier>-maven-release-staging"
+                        fi
+
+                        if [ "<+stage.variables.NEXUS_REGISTRY_VERSION>" = "release" ]; then
+                            NEXUS_SNAPSHOT_REPOSITORY_URL="https://artefacts.lloydsbanking.cloud/repository/<+stage.variables.NEXUS_REGISTRY_VISIBILITY>-<+org.identifier>_<+project.identifier>-maven-snapshot"
+                            NEXUS_RELEASE_REPOSITORY_URL="https://artefacts.lloydsbanking.cloud/repository/<+stage.variables.NEXUS_REGISTRY_VISIBILITY>-<+org.identifier>_<+project.identifier>-maven-release"
+                        fi
+
+                            echo "Release URL: $NEXUS_RELEASE_REPOSITORY_URL"
+                            echo "Snapshot URL: $NEXUS_SNAPSHOT_REPOSITORY_URL"
+
+                        # Create the init.gradle file with the necessary repository URLs and credentials
+                        cat <<EOF > init.gradle
+                        // Repository URLs
+                        def SARPrivateMavenSnapshotUrl = "${NEXUS_SAR_PRIVATE_MAVEN_SNAPSHOT_URL}"
+                        def SARPrivateMavenReleaseUrl = "${NEXUS_SAR_PRIVATE_MAVEN_RELEASE_URL}"
+                        def SARInnerSourceMavenSnapshotUrl = "${NEXUS_SAR_INNERSOURCE_MAVEN_SNAPSHOT_URL}"
+                        def SARInnerSourceMavenReleaseUrl = "${NEXUS_SAR_INNERSOURCE_MAVEN_RELEASE_URL}"
+                        def SARGradleUrl = "${NEXUS_SAR_GRADLE_URL}"
+                        def SARMavenUrl = "${NEXUS_SAR_MAVEN_URL}"
+                        def SARMavenSnapshot = "${SAR_MAVEN_SNAPSHOT_URL}"
+                        def SARMavenStaging = "${SAR_MAVEN_STAGING_URL}"
+                        def SAR_Reader_Name = "${NEXUS_SAR_READER_NAME}"
+                        def SAR_Reader_Pass = "${NEXUS_SAR_READER_PASS}"
+
+                        // Set system properties for HTTP timeouts
+                        System.setProperty('org.gradle.internal.http.connectionTimeout', '60000') // 1 minute
+                        System.setProperty('org.gradle.internal.http.socketTimeout', '1800000') // 30 minutes
+                        // Function to configure repositories
+                        def configureRepositories = { repoHandler ->
+                            {
+                              repoHandler.maven {
+                                  url = uri(SARMavenUrl)
+                                  credentials {
+                                      username = SAR_Reader_Name
+                                      password = SAR_Reader_Pass
+                                  }
+                              }
+                              repoHandler.maven {
+                                  url = uri(SARGradleUrl)
+                                  credentials {
+                                      username = SAR_Reader_Name
+                                      password = SAR_Reader_Pass
+                                  }
+                              }
+                              repoHandler.maven {
+                                  url = uri(SARMavenSnapshot)
+                                  credentials {
+                                      username = SAR_Reader_Name
+                                      password = SAR_Reader_Pass
+                                  }
+                              }
+                              repoHandler.maven {
+                                  url = uri(SARMavenStaging)
+                                  credentials {
+                                      username = SAR_Reader_Name
+                                      password = SAR_Reader_Pass
+                                  }
+                              }
+                              repoHandler.maven {
+                                  url = uri(SARInnerSourceMavenReleaseUrl)
+                                  credentials {
+                                      username = SAR_Reader_Name
+                                      password = SAR_Reader_Pass
+                                  }
+                              }
+                              repoHandler.maven {
+                                  url = uri(SARInnerSourceMavenSnapshotUrl)
+                                  credentials {
+                                      username = SAR_Reader_Name
+                                      password = SAR_Reader_Pass
+                                  }
+                              }
+                              repoHandler.maven {
+                                  url = uri(SARPrivateMavenSnapshotUrl)
+                                  credentials {
+                                      username = SAR_Reader_Name
+                                      password = SAR_Reader_Pass
+                                  }
+                              }
+                              repoHandler.maven {
+                                  url = uri(SARPrivateMavenReleaseUrl)
+                                  credentials {
+                                      username = SAR_Reader_Name
+                                      password = SAR_Reader_Pass
+                                  }
+                              }
+                          }
+                        }
+
+                        // Ensure only approved plugin repositories are used in settings.gradle
+                        settingsEvaluated { settings ->
+                            settings.pluginManagement {
+                                repositories.clear()
+                                repositories(configureRepositories)
+                            }
+                            settings.buildCache {
+                                local {
+                                    directory = new File("/harness/.gradle/caches/build-cache")
+                                    enabled = true
+                                }
+                            }
+                        }
+
+                        // All projects configuration
+                        allprojects {
+                            configurations.all {
+                                resolutionStrategy {
+                                    cacheChangingModulesFor 0, 'seconds'
+                                    cacheDynamicVersionsFor 15, 'minutes'
+                                }
+                            }
+                            repositories(configureRepositories)
+                                afterEvaluate { project ->
+                                def resolvedUrl = rootProject.version.toString().endsWith("-SNAPSHOT") ? "${NEXUS_SNAPSHOT_REPOSITORY_URL}" : "${NEXUS_RELEASE_REPOSITORY_URL}"
+                                logger.lifecycle("RESOLVED_REPO_URL= " + resolvedUrl)
+                                project.repositories.clear()
+                                project.repositories(configureRepositories)
+                            }
+                        }
+                        EOF
+                        echo "init.gradle file created successfully."
+
+                        echo "Adding default project name <+pipeline.properties.ci.codebase.repoName> to settings.gradle. Add 'rootProject.name = "yourproject"' entry to source settings.gradle to override..."
+                        touch settings.gradle && echo 'rootProject.name = "<+pipeline.properties.ci.codebase.repoName>"' | cat settings.gradle - > temp && mv temp settings.gradle
+                      envVariables:
+                        NEXUS_SAR_GRADLE_URL: https://artefacts.lloydsbanking.cloud/repository/gradle-osg-proxy/
+                        NEXUS_SAR_READER_NAME: <+secrets.getValue("account.nexus_sar_reader_token_name")>
+                        NEXUS_SAR_READER_PASS: <+secrets.getValue("account.nexus_sar_reader_token_pass")>
+                        NEXUS_SAR_PRIVATE_MAVEN_SNAPSHOT_URL: https://artefacts.lloydsbanking.cloud/repository/private-<+org.identifier>_<+project.identifier>-maven-snapshot-group/
+                        NEXUS_SAR_PRIVATE_MAVEN_RELEASE_URL: https://artefacts.lloydsbanking.cloud/repository/private-<+org.identifier>_<+project.identifier>-maven-release-group/
+                        NEXUS_SAR_INNERSOURCE_MAVEN_SNAPSHOT_URL: https://artefacts.lloydsbanking.cloud/repository/innersource-<+org.identifier>_<+project.identifier>-maven-snapshot-group/
+                        NEXUS_SAR_INNERSOURCE_MAVEN_RELEASE_URL: https://artefacts.lloydsbanking.cloud/repository/innersource-<+org.identifier>_<+project.identifier>-maven-release-group/
+                        NEXUS_SAR_MAVEN_URL: https://artefacts.lloydsbanking.cloud/repository/maven-osg-proxy/
+                        SAR_MAVEN_SNAPSHOT_URL: https://artefacts.lloydsbanking.cloud/repository/innersource-evbk1_ebblt2-maven-snapshot/
+                        SAR_MAVEN_STAGING_URL: https://artefacts.lloydsbanking.cloud/repository/innersource-evbk1_ebblt2-maven-release-staging/
+                        GRADLE_VERSION: 8.14.0-jdk17
+                - step:
+                    type: Run
+                    name: Gatling Performance Testing
+                    identifier: Gatling_Performance_Testing
+                    spec:
+                      connectorRef: account.gcp_rtl_ssv_gar_ro_gsa
+                      image: europe-docker.pkg.dev/ssv-rtl-devops-registry-624/release/docker.io/gradle:<+stage.variables.GRADLE_VERSION>
+                      shell: Sh
+                      command: |-
+                        #!/bin/bash
+                        awk '
+                        v{v=v"\n"$0}
+                        /----BEGIN/ {v=$0; cert++}
+                        /----END/&&v{
+                          print v > "tmp.crt"
+                          close("tmp.crt")
+                          system("keytool -import -noprompt -trustcacerts -alias lloyds-hcvault-ca-"cert" -storepass changeit -cacerts -file tmp.crt")
+                          v=x}' /etc/ssl/certs/ca-certificates.crt
+
+                        cat << EOF > root.pem
+                        ${ngSecretManager.obtain("account.lbg_preprod_root_ca", -1740076442)}
+                        EOF
+                        keytool -import -noprompt -trustcacerts -alias lbg-root -storepass changeit -cacerts -file root.pem
+                        export ENV_NAME=<+stage.variables.gatling_env>
+                        export REPONAME=<+pipeline.stages.Gatling.spec.execution.steps.Gatling_Test.steps.Git_Clone.spec.repoName>
+                        export PIPELINE_ID=<+pipeline.executionId>
+
+                        export REPORT_NAME="${ENV_NAME}/${REPONAME}/${PIPELINE_ID}"
+                        export REPORT_PATH="/harness/build/reports/gatling"
+                        env
+                        gradle --version
+
+                        gradle clean gatlingRun --exclude-task test --info --no-daemon --build-cache --init-script ./init.gradle
+
+
+                        echo "Gatling Path: ${REPORT_NAME}"
+                        # export TARBALL_NAME="<+pipeline.properties.ci.codebase.repoName>-<+pipeline.executionId>.tar.gz"
+
+                        # echo "Report Name: ${REPORT_NAME} Report Path: ${REPORT_PATH} Tar: ${TARBALL_NAME} ENV_NAME: ${ENV_NAME}"
+
+                        # tar -zcvf $TARBALL_NAME -C /harness/build/reports gatling
+                        ls -lrt
+                      reports:
+                        type: JUnit
+                        spec:
+                          paths:
+                            - "**/*.xml"
+                      envVariables:
+                        NEXUS_SAR_READER_NAME: <+secrets.getValue("account.nexus_sar_reader_token_name")>
+                        NEXUS_SAR_READER_PASS: <+secrets.getValue("account.nexus_sar_reader_token_pass")>
+                        SARRawUrl: https://artefacts.lloydsbanking.cloud/repository/innersource-evbk1_ebblt2-raw/gradle
+                      outputVariables:
+                        - name: REPORT_PATH
+                          type: String
+                          value: REPORT_PATH
+                        - name: REPORT_NAME
+                          type: String
+                          value: REPORT_NAME
+                - step:
+                    type: Run
+                    name: Upload Report
+                    identifier: Run_3
+                    spec:
+                      connectorRef: account.gcp_rtl_ssv_gar_ro_gsa
+                      image: europe-docker.pkg.dev/ssv-rtl-devops-registry-624/release/hxkxmfkerhkxktic/gtxsdmgdiqsxcmqv/null/images/gcloud-sdk-non-root:v0.20.0
+                      shell: Sh
+                      command: |-
+                        #!/bin/bash
+                        GREEN='\033[1;32m'
+                        NC='\033[0m' # No Color (Reset)
+                        ls -lrt
+                        TARBALL_NAME="<+pipeline.stages.Gatling.spec.execution.steps.Gatling_Test.steps.Git_Clone.spec.repoName>-<+pipeline.executionId>.tar.gz"
+                        echo "REPORT_PATH: ${REPORT_PATH}"
+
+                        gcloud config set project <+stage.variables.PROJECT_ID>
+
+                        echo "Uploading ${REPORT_PATH} → gs://${BUCKET}/${PATH_TO_UPLOAD}/${REPORT_NAME}/ ..."
+
+                        tar -czvf "$TARBALL_NAME" \
+                          -C "$(dirname "$REPORT_PATH")" \
+                          "$(basename "$REPORT_PATH")"
+
+                        gcloud storage cp -r \
+                          "$TARBALL_NAME" \
+                          gs://${BUCKET}/${PATH_TO_UPLOAD}/${REPORT_NAME}/
+
+                        echo "Listing the uploaded path..."
+
+                        gcloud storage ls \
+                          gs://${BUCKET}/${PATH_TO_UPLOAD}/${REPORT_NAME}/
+
+                        echo -e "\033[1m Download the ${REPORT_NAME} archive to your current folder with the below command: \033[0m"
+                        echo -e "${GREEN}gcloud storage cp gs://${BUCKET}/${PATH_TO_UPLOAD}/${REPORT_NAME}/${TARBALL_NAME} .${NC}"
+                      envVariables:
+                        PATH_TO_UPLOAD: <+stage.variables.PATH_TO_UPLOAD>
+                        REPORT_PATH: <+pipeline.stages.Gatling.spec.execution.steps.Gatling_Test.steps.Gatling_Performance_Testing.output.outputVariables.REPORT_PATH>
+                        REPORT_NAME: <+pipeline.stages.Gatling.spec.execution.steps.Gatling_Test.steps.Gatling_Performance_Testing.output.outputVariables.REPORT_NAME>
+                        CLOUDSDK_AUTH_ACCESS_TOKEN: <+pipeline.stages.Gatling.spec.execution.steps.StepGroup_CI_StepGroup_OIDC_Token_Generation.steps.oidc_token_generation.output.outputVariables.GCLOUD_ACCESS_TOKEN>
+                        BUCKET: <+stage.variables.BUCKET>
+                - step:
+                    type: Plugin
+                    name: Publish Report Path
+                    identifier: Publish_Report_Path
+                    spec:
+                      connectorRef: account.gcp_rtl_ssv_gar_ro_gsa
+                      image: europe-docker.pkg.dev/ssv-rtl-devops-registry-624/release/docker.io/plugins/artifact-metadata-publisher:2.1.0
+                      settings:
+                        file_urls: <+stage.variables.BUCKET>/<+stage.variables.PATH_TO_UPLOAD>/<+pipeline.stages.Gatling.spec.execution.steps.Gatling_Test.steps.Gatling_Performance_Testing.output.outputVariables.REPORT_NAME>
+                        artifact_file: Reports in GCS bucket
+              stepGroupInfra:
+                type: KubernetesDirect
+                spec:
+                  connectorRef: account.central_ci
+                  volumes: []
+                  harnessImageConnectorRef: account.harness_ci_addon_rtl
+    variables:
+      - name: BUCKET
+        type: String
+        description: |
+          GCS bucket name (e.g. my-bucket). Leave blank to skip upload.
+        required: false
+        value: <+input>
+      - name: PROJECT_ID
+        type: String
+        description: GCP project ID (e.g. wrk-pre-wrk01-svp-6aa32f)
+        required: false
+        value: <+input>
+      - name: PATH_TO_UPLOAD
+        type: String
+        description: Path prefix in your bucket where reports will be uploaded (e.g. Gatling-Reports)
+        required: false
+        value: <+input>
+      - name: GRADLE_VERSION
+        type: String
+        description: Version of Gradle. Default version - 8.14.0-jdk17. Available versions - 8.14.0-jdk17, 8.14.0-jdk21, 8.14.0-jdk24.
+        required: false
+        value: <+input>.default(8.14.0-jdk17).allowedValues(8.14.0-jdk17,8.14.0-jdk21,8.14.0-jdk24)
+      - name: gatling_env
+        type: String
+        description: Gatling Environment
+        required: false
+        value: <+input>.default(DEV).allowedValues(DEV,INT,PRE,PROD)

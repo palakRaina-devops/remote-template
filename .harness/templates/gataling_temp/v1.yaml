@@ -1,0 +1,531 @@
+template:
+  name: Gradle BDD Tests
+  identifier: CD_Stage_Gradle_BDD_Tests
+  versionLabel: v1.x.x
+  type: Stage
+  description: Runs BDD Tests/Acceptance tests using Gradle karate test suite, publishes Cucumber based reporting to GCS.
+  tags:
+    owning_platform: Everyday Banking Platform
+    owning_lab: EDB-DevOps Team - Run & Change Lab
+    snow_group: IT.DIGITAL.EDB
+    documentation_link: https://lbg.atlassian.net/wiki/x/X5msJg
+    deprecation_date: live
+    expiry_date: live
+  spec:
+    type: Custom
+    spec:
+      execution:
+        steps:
+          - stepGroup:
+              name: StepGroup_CI_StepGroup_OIDC_Token_Generation
+              identifier: StepGroup_CI_StepGroup_OIDC_Token_Generation
+              template:
+                templateRef: account.CD_StepGroup_OIDC_Token_Generation
+                versionLabel: v2.0.1
+                templateInputs:
+                  variables:
+                    - name: ENVIRONMENT_ID
+                      type: String
+                      value: <+input>.default(pre).allowedValues(pre,prod,rtl,int)
+                    - name: GCP_SERVICE_ACCOUNT_EMAIL
+                      type: String
+                      value: <+input>.regex(^[ \t\r\n]*[A-Za-z0-9][A-Za-z0-9._%+\-]*@[a-z][a-z0-9\-]*[.]iam[.]gserviceaccount[.]com[ \t\r\n]*$)
+                    - name: CREATE_CRED_FILE
+                      type: String
+                      value: <+input>.default(false).allowedValues(false,true)
+              when:
+                stageStatus: All
+                condition: <+!<+<+stage.variables.BUCKET>.isEmpty()>>
+            contextType: StageTemplate
+          - stepGroup:
+              name: BDDs with Reports
+              identifier: BDDs_with_Reports
+              steps:
+                - step:
+                    type: GitClone
+                    name: GitClone
+                    identifier: GitClone
+                    spec:
+                      connectorRef: <+input>
+                      repoName: <+input>
+                      cloneDirectory: /harness/
+                      build:
+                        type: branch
+                        spec:
+                          branch: <+input>
+                - step:
+                    type: Run
+                    name: Gradle Init
+                    identifier: Gradle_Init
+                    spec:
+                      connectorRef: account.gcp_rtl_ssv_gar_ro_gsa
+                      image: europe-docker.pkg.dev/ssv-rtl-devops-registry-624/release/docker.io/gradle:<+stage.variables.GRADLE_VERSION>
+                      shell: Sh
+                      command: |-
+                        #!/bin/sh
+
+                        if [ "<+stage.variables.NEXUS_REGISTRY_VERSION>" = "staging" ]; then
+                            NEXUS_SNAPSHOT_REPOSITORY_URL="https://artefacts.lloydsbanking.cloud/repository/<+stage.variables.NEXUS_REGISTRY_VISIBILITY>-<+org.identifier>_<+project.identifier>-maven-snapshot-staging"
+                            NEXUS_RELEASE_REPOSITORY_URL="https://artefacts.lloydsbanking.cloud/repository/<+stage.variables.NEXUS_REGISTRY_VISIBILITY>-<+org.identifier>_<+project.identifier>-maven-release-staging"
+                        fi
+
+                                if [ "<+stage.variables.NEXUS_REGISTRY_VERSION>" = "release" ]; then
+                                    NEXUS_SNAPSHOT_REPOSITORY_URL="https://artefacts.lloydsbanking.cloud/repository/<+stage.variables.NEXUS_REGISTRY_VISIBILITY>-<+org.identifier>_<+project.identifier>-maven-snapshot"
+                                    NEXUS_RELEASE_REPOSITORY_URL="https://artefacts.lloydsbanking.cloud/repository/<+stage.variables.NEXUS_REGISTRY_VISIBILITY>-<+org.identifier>_<+project.identifier>-maven-release"
+                                fi
+
+                                    echo "Release URL: $NEXUS_RELEASE_REPOSITORY_URL"
+                                    echo "Snapshot URL: $NEXUS_SNAPSHOT_REPOSITORY_URL"
+
+                        # Create the init.gradle file with the necessary repository URLs and credentials
+                        cat <<EOF > init.gradle
+                        // Repository URLs
+                        def SARPrivateMavenSnapshotUrl = "${NEXUS_SAR_PRIVATE_MAVEN_SNAPSHOT_URL}"
+                        def SARPrivateMavenReleaseUrl = "${NEXUS_SAR_PRIVATE_MAVEN_RELEASE_URL}"
+                        def SARInnerSourceMavenSnapshotUrl = "${NEXUS_SAR_INNERSOURCE_MAVEN_SNAPSHOT_URL}"
+                        def SARInnerSourceMavenReleaseUrl = "${NEXUS_SAR_INNERSOURCE_MAVEN_RELEASE_URL}"
+                        def SARGradleUrl = "${NEXUS_SAR_GRADLE_URL}"
+                        def SARMavenUrl = "${NEXUS_SAR_MAVEN_URL}"
+                        def SAR_Reader_Name = "${NEXUS_SAR_READER_NAME}"
+                        def SAR_Reader_Pass = "${NEXUS_SAR_READER_PASS}"
+
+                        // Set system properties for HTTP timeouts
+                        System.setProperty('org.gradle.internal.http.connectionTimeout', '60000') // 1 minute
+                        System.setProperty('org.gradle.internal.http.socketTimeout', '1800000') // 30 minutes
+                        // Function to configure repositories
+                        def configureRepositories = { repoHandler ->
+                            {
+                              repoHandler.maven {
+                                  url = uri(SARMavenUrl)
+                                  credentials {
+                                      username = SAR_Reader_Name
+                                      password = SAR_Reader_Pass
+                                  }
+                              }
+                              repoHandler.maven {
+                                  url = uri(SARGradleUrl)
+                                  credentials {
+                                      username = SAR_Reader_Name
+                                      password = SAR_Reader_Pass
+                                  }
+                              }
+                              repoHandler.maven {
+                                  url = uri(SARInnerSourceMavenReleaseUrl)
+                                  credentials {
+                                      username = SAR_Reader_Name
+                                      password = SAR_Reader_Pass
+                                  }
+                              }
+                              repoHandler.maven {
+                                  url = uri(SARInnerSourceMavenSnapshotUrl)
+                                  credentials {
+                                      username = SAR_Reader_Name
+                                      password = SAR_Reader_Pass
+                                  }
+                              }
+                              repoHandler.maven {
+                                  url = uri(SARPrivateMavenSnapshotUrl)
+                                  credentials {
+                                      username = SAR_Reader_Name
+                                      password = SAR_Reader_Pass
+                                  }
+                              }
+                              repoHandler.maven {
+                                  url = uri(SARPrivateMavenReleaseUrl)
+                                  credentials {
+                                      username = SAR_Reader_Name
+                                      password = SAR_Reader_Pass
+                                  }
+                              }
+                          }
+                        }
+
+                        // Ensure only approved plugin repositories are used in settings.gradle
+                        settingsEvaluated { settings ->
+                            settings.pluginManagement {
+                                repositories.clear()
+                                repositories(configureRepositories)
+                            }
+                            settings.buildCache {
+                                local {
+                                    directory = new File("/harness/.gradle/caches/build-cache")
+                                    enabled = true
+                                }
+                            }
+                        }
+
+                        // All projects configuration
+                        allprojects {
+                            configurations.all {
+                                resolutionStrategy {
+                                    cacheChangingModulesFor 0, 'seconds'
+                                    cacheDynamicVersionsFor 15, 'minutes'
+                                }
+                            }
+                            repositories(configureRepositories)
+                                afterEvaluate { project ->
+                                def resolvedUrl = rootProject.version.toString().endsWith("-SNAPSHOT") ? "${NEXUS_SNAPSHOT_REPOSITORY_URL}" : "${NEXUS_RELEASE_REPOSITORY_URL}"
+                                logger.lifecycle("RESOLVED_REPO_URL= " + resolvedUrl)
+                                project.repositories.clear()
+                                project.repositories(configureRepositories)
+                            }
+                        }
+                        EOF
+                        echo "init.gradle file created successfully."
+
+                        echo "Adding default project name <+stepGroup.steps.GitClone.spec.repoName> to settings.gradle. Add 'rootProject.name = "yourproject"' entry to source settings.gradle to override..."
+                        touch settings.gradle && echo 'rootProject.name = "<+stepGroup.steps.GitClone.spec.repoName>"' | cat settings.gradle - > temp && mv temp settings.gradle
+                      envVariables:
+                        NEXUS_SAR_PRIVATE_MAVEN_SNAPSHOT_URL: https://artefacts.lloydsbanking.cloud/repository/private-<+org.identifier>_<+project.identifier>-maven-snapshot-group/
+                        NEXUS_SAR_PRIVATE_MAVEN_RELEASE_URL: https://artefacts.lloydsbanking.cloud/repository/private-<+org.identifier>_<+project.identifier>-maven-release-group/
+                        NEXUS_SAR_INNERSOURCE_MAVEN_SNAPSHOT_URL: https://artefacts.lloydsbanking.cloud/repository/innersource-<+org.identifier>_<+project.identifier>-maven-snapshot-group/
+                        NEXUS_SAR_INNERSOURCE_MAVEN_RELEASE_URL: https://artefacts.lloydsbanking.cloud/repository/innersource-<+org.identifier>_<+project.identifier>-maven-release-group/
+                        NEXUS_SAR_GRADLE_URL: https://artefacts.lloydsbanking.cloud/repository/gradle-osg-proxy/
+                        NEXUS_SAR_MAVEN_URL: https://artefacts.lloydsbanking.cloud/repository/maven-osg-proxy/
+                        NEXUS_SAR_READER_NAME: <+secrets.getValue("account.nexus_sar_reader_token_name")>
+                        NEXUS_SAR_READER_PASS: <+secrets.getValue("account.nexus_sar_reader_token_pass")>
+                - step:
+                    type: Run
+                    name: Acceptance Test
+                    identifier: Acceptance_Test
+                    spec:
+                      connectorRef: account.gcp_rtl_ssv_gar_ro_gsa
+                      image: europe-docker.pkg.dev/ssv-rtl-devops-registry-624/release/docker.io/gradle:<+stage.variables.GRADLE_VERSION>
+                      shell: Sh
+                      command: |-
+                        set +e
+                        GREEN='\033[1;32m'
+                        RED='\033[1;31m'
+                        NC='\033[0m' # No Color (Reset)
+                        export REPONAME=<+stage.spec.execution.steps.BDDs_with_Reports.steps.GitClone.spec.repoName>
+                        echo "REPONAME: ${REPONAME}"
+                        export PIPELINE_ID=<+pipeline.executionId>
+                        echo "PIPELINE_ID: ${PIPELINE_ID}"
+                        export ENV_NAME=<+stage.variables.karate_env>
+                        echo "ENV_NAME: ${ENV_NAME}"
+                        export REPORT_PATH="/harness/build/karate-reports/cucumber-html-reports"
+                        export REPORT_NAME="${ENV_NAME}/${REPONAME}/${PIPELINE_ID}"
+
+                        # Default values in case report doesn't exist
+                        export PASS_PERCENT="0.00"
+                        export TOTAL_TESTS="0"
+                        export PASSED_TESTS="0"
+                        export FAILED_TESTS="0"
+                        export SKIPPED_TESTS="0"
+
+                        awk '
+                        v{v=v"\n"$0}
+                        /----BEGIN/ {v=$0; cert++}
+                        /----END/&&v{
+                          print v > "tmp.crt"
+                          close("tmp.crt")
+                          system("keytool -import -noprompt -trustcacerts -alias lloyds-hcvault-ca-"cert" -storepass changeit -cacerts -file tmp.crt")
+                          v=x}' /etc/ssl/certs/ca-certificates.crt
+
+                        cat << EOF > root.pem
+                        ${ngSecretManager.obtain("account.lbg_preprod_root_ca", -1740076442)}
+                        EOF
+                        keytool -import -noprompt -trustcacerts -alias lbg-root -storepass changeit -cacerts -file root.pem
+
+                        cat << EOF > inter.pem
+                        ${ngSecretManager.obtain("account.lbg_prod_root_ca", -1740076442)}
+                        EOF
+                        keytool -import -noprompt -trustcacerts -alias lbg-inter -storepass changeit -cacerts -file inter.pem
+
+                        gradle clean acceptanceTests -Dkarate.env=<+stage.variables.karate_env> -Dkarate.options="--tags <+stage.variables.karate_tags>" --exclude-task test --info --no-daemon --build-cache --init-script ./init.gradle --stacktrace
+
+
+                        # Path to the HTML reports directory
+                        REPORT_DIR="/harness/build/karate-reports/cucumber-html-reports"
+                        FEATURES_HTML="$REPORT_DIR/overview-features.html"
+
+                        # User-provided threshold (e.g., set THRESH via Harness stage variable)
+                        THRESH="<+stage.variables.THRESHOLD>"
+                        echo $THRESH
+                        [ -f "$FEATURES_HTML" ] || { echo "ERROR: $FEATURES_HTML not found"; exit 1; }
+
+                        # Extract from the HTML table footer which has the totals
+                        # Looking for: <tfoot class="total"> then first <tr> has multiple lines with <td>NUMBER</td>
+                        tfoot_section="$(grep -A 20 '<tfoot class="total">' "$FEATURES_HTML")"
+
+                        if [ -z "$tfoot_section" ]; then
+                          echo "ERROR: Could not find tfoot section in $FEATURES_HTML"
+                          exit 1
+                        fi
+
+                        # Extract all numbers from <td> tags (each td is on its own line)
+                        # Get first 6 numbers: passed, failed, skipped, pending, undefined, total
+                        all_nums="$(echo "$tfoot_section" | grep -oE '<td>[0-9]+</td>' | grep -oE '[0-9]+' | head -6)"
+
+                        # Assign: first 3 numbers are passed, failed, skipped
+                        pass="$(echo "$all_nums" | sed -n '1p')"
+                        fail="$(echo "$all_nums" | sed -n '2p')"
+                        skip="$(echo "$all_nums" | sed -n '3p')"
+
+                        # Validate extracted numbers
+                        if [ -z "$pass" ] || [ -z "$fail" ] || [ -z "$skip" ]; then
+                          echo "ERROR: Could not extract step counts (pass=$pass, fail=$fail, skip=$skip)"
+                          echo "DEBUG: all_nums=$all_nums"
+                          exit 1
+                        fi
+
+                        # Compute pass percentage with awk (two decimals)
+                        total=$(( pass + fail + skip ))
+                        if [ "$total" -eq 0 ]; then
+                          percent="0.00"
+                        else
+                          percent="$(awk -v p="$pass" -v t="$total" 'BEGIN{printf("%.2f",(p*100.0)/t)}')"
+                        fi
+
+                        echo "Steps: passed=$pass, failed=$fail, skipped=$skip, total=$total → pass%=$percent"
+
+                        export PASS_PERCENT="${percent}"
+                        export TOTAL_TESTS="$total"
+                        export PASSED_TESTS="$pass"
+                        export FAILED_TESTS="$fail"
+                        export SKIPPED_TESTS="$skip"
+                        # Threshold compare and fail step if below
+                        below="$(awk -v a="$percent" -v b="$THRESH" 'BEGIN{print (a+0<b+0)?1:0}')"
+                        if [ "$below" -eq 1 ]; then
+                          echo "${RED}  Pass% ${percent}% is below threshold ${THRESH}% .${NC}"
+                          # echo " Pass% ${percent}% is below threshold ${THRESH}% — failing step."
+                          # exit 1
+                        else
+                          echo "${GREEN}  Pass% ${percent}% meets threshold ${THRESH}% .${NC}"
+                          # echo " Pass% ${percent}% meets threshold ${THRESH}%."
+                        fi
+                      envVariables:
+                        GRADLE_USER_HOME: /harness/.gradle
+                        GRADLE_OPTS: "-Dorg.gradle.jvmargs=\"-Xms1024m -Xmx2048m\""
+                        GRADLE_PROPERTIES: org.gradle.caching=true
+                      outputVariables:
+                        - name: REPORT_PATH
+                          type: String
+                          value: REPORT_PATH
+                        - name: REPORT_NAME
+                          type: String
+                          value: REPORT_NAME
+                        - name: PASS_PERCENT
+                          type: String
+                          value: PASS_PERCENT
+                        - name: TOTAL_TESTS
+                          type: String
+                          value: TOTAL_TESTS
+                        - name: PASSED_TESTS
+                          type: String
+                          value: PASSED_TESTS
+                        - name: FAILED_TESTS
+                          type: String
+                          value: FAILED_TESTS
+                        - name: SKIPPED_TESTS
+                          type: String
+                          value: SKIPPED_TESTS
+                      resources:
+                        limits:
+                          memory: <+input>.default(4Gi).regex(^(500Mi|([5-7][0-9]{2}|[1-7][0-9]{3}|8000)Mi|([1-7]Gi|8Gi))$)
+                          cpu: <+input>.default(2).regex(^(500m|[5-9][0-9]{2}m|[1-3]([0-9]{2})?m?|[1-3](\.[0-9]+)?|4(\.0+)?)$)
+                    failureStrategies:
+                      - onFailure:
+                          errors:
+                            - AllErrors
+                          action:
+                            type: MarkAsSuccess
+                    when:
+                      stageStatus: All
+                  contextType: StageTemplate
+                - step:
+                    type: Run
+                    name: Upload Report
+                    identifier: upload_report
+                    spec:
+                      connectorRef: account.gcp_rtl_ssv_gar_ro_gsa
+                      image: europe-docker.pkg.dev/ssv-rtl-devops-registry-624/release/hxkxmfkerhkxktic/gtxsdmgdiqsxcmqv/null/images/gcloud-sdk-non-root:v0.20.0
+                      shell: Sh
+                      command: |-
+                        #!/bin/bash
+                        GREEN='\033[1;32m'
+                        NC='\033[0m' # No Color (Reset)
+                        TARBALL_NAME="report-<+pipeline.executionId>.tar.gz"
+                        echo "REPORT_PATH: ${REPORT_PATH}"
+
+                        gcloud config set project <+stage.variables.PROJECT_ID>
+
+                        echo "Uploading ${REPORT_PATH} → gs://${BUCKET}/${PATH_TO_UPLOAD}/${REPORT_NAME}/ ..."
+
+                        tar -czvf "$TARBALL_NAME" \
+                          -C "$(dirname "$REPORT_PATH")" \
+                          "$(basename "$REPORT_PATH")"
+
+                        gcloud storage cp -r \
+                          "$TARBALL_NAME" \
+                          gs://${BUCKET}/${PATH_TO_UPLOAD}/${REPORT_NAME}/
+
+                        echo "Listing the uploaded path..."
+
+                        gcloud storage ls \
+                          gs://${BUCKET}/${PATH_TO_UPLOAD}/${REPORT_NAME}/
+
+                        echo -e "\033[1m Download the ${REPORT_NAME} archive to your current folder with the below command: \033[0m"
+                        echo -e "${GREEN}gcloud storage cp gs://${BUCKET}/${PATH_TO_UPLOAD}/${REPORT_NAME}/${TARBALL_NAME} .${NC}"
+                      privileged: false
+                      envVariables:
+                        PATH_TO_UPLOAD: <+stage.variables.PATH_TO_UPLOAD>
+                        REPORT_PATH: <+stage.spec.execution.steps.BDDs_with_Reports.steps.Acceptance_Test.output.outputVariables.REPORT_PATH>
+                        REPORT_NAME: <+stage.spec.execution.steps.BDDs_with_Reports.steps.Acceptance_Test.output.outputVariables.REPORT_NAME>
+                        CLOUDSDK_AUTH_ACCESS_TOKEN: <+stage.spec.execution.steps.StepGroup_CI_StepGroup_OIDC_Token_Generation.steps.oidc_token_generation.output.outputVariables.GCLOUD_ACCESS_TOKEN>
+                        BUCKET: <+stage.variables.BUCKET>
+                      imagePullPolicy: IfNotPresent
+                      runAsUser: "1000"
+                    when:
+                      stageStatus: All
+                      condition: <+!<+<+stage.variables.BUCKET>.isEmpty()>>
+                  contextType: StageTemplate
+                - step:
+                    type: Plugin
+                    name: Publish Report Path
+                    identifier: publish_report
+                    spec:
+                      connectorRef: account.gcp_rtl_ssv_gar_ro_gsa
+                      image: europe-docker.pkg.dev/ssv-rtl-devops-registry-624/release/docker.io/plugins/artifact-metadata-publisher:2.1.0
+                      settings:
+                        file_urls: <+stage.variables.BUCKET>/<+stage.variables.PATH_TO_UPLOAD>/<+execution.steps.BDDs_with_Reports.steps.Acceptance_Test.output.outputVariables.REPORT_NAME>
+                        artifact_file: Reports in GCS bucket
+                      imagePullPolicy: IfNotPresent
+                      resources:
+                        limits:
+                          memory: <+input>.default(1Gi).regex(^(500Mi|([5-7][0-9]{2}|[1-7][0-9]{3}|8000)Mi|([1-7]Gi|8Gi|16Gi|32Gi))$)
+                          cpu: <+input>.default(1).regex(^(500m|[5-9][0-9]{2}m|[1-3]([0-9]{2})?m?|[1-3](\.[0-9]+)?|4(\.0+)?|8(\.0+)?|16(\.0+)?|32(\.0+)?)$)
+                    when:
+                      stageStatus: All
+                      condition: <+!<+<+stage.variables.BUCKET>.isEmpty()>>
+                  contextType: StageTemplate
+                - step:
+                    type: Run
+                    name: Validate Test Results
+                    identifier: Validate_Test_Results
+                    spec:
+                      connectorRef: account.gcp_rtl_ssv_gar_ro_gsa
+                      image: europe-docker.pkg.dev/ssv-rtl-devops-registry-624/release/docker.io/alpine:3.21.0
+                      shell: Sh
+                      command: |-
+                        #!/bin/sh
+                        GREEN='\033[1;32m'
+                        RED='\033[1;31m'
+                        NC='\033[0m' # No Color (Reset)
+                        THRESH="<+stage.variables.THRESHOLD>"
+                        PERCENT="<+stage.spec.execution.steps.BDDs_with_Reports.steps.Acceptance_Test.output.outputVariables.PASS_PERCENT>"
+                        TOTAL="<+stage.spec.execution.steps.BDDs_with_Reports.steps.Acceptance_Test.output.outputVariables.TOTAL_TESTS>"
+                        PASSED="<+stage.spec.execution.steps.BDDs_with_Reports.steps.Acceptance_Test.output.outputVariables.PASSED_TESTS>"
+                        FAILED="<+stage.spec.execution.steps.BDDs_with_Reports.steps.Acceptance_Test.output.outputVariables.FAILED_TESTS>"
+                        SKIPPED_TESTS="<+stage.spec.execution.steps.BDDs_with_Reports.steps.Acceptance_Test.output.outputVariables.SKIPPED_TESTS>"
+
+                        echo "=========================================="
+                        echo "Test Results Summary:"
+                        echo "Pass Rate: ${PERCENT}%"
+                        echo "Total Tests: ${TOTAL}"
+                        echo "Passed: ${PASSED}"
+                        echo "Failed: ${FAILED}"
+                        echo "SKIPPED_TESTS: ${SKIPPED_TESTS}"
+                        echo "Threshold: ${THRESH}%"
+                        echo "=========================================="
+
+                        # ls -lrtha /harness/build/karate-reports
+                        # Check if we have valid data
+                        if [ -z "$PERCENT" ]; then
+                          echo -e "${RED}  ERROR: No test results found - output variables not populated .${NC}"
+                          exit 1
+                        fi
+
+                        if [ "$TOTAL" = "0" ] || [ -z "$TOTAL" ]; then
+                          echo -e "${RED} ERROR: No tests were executed .${NC}"
+                          exit 1
+                        fi
+
+                        # Check threshold using awk for floating point comparison
+                        BELOW=$(awk -v p="$PERCENT" -v t="$THRESH" 'BEGIN{print (p+0 < t+0) ? 1 : 0}')
+
+                        if [ "$BELOW" -eq 1 ]; then
+                          echo -e "${RED}  FAILED - Pass rate ${PERCENT}% is below threshold ${THRESH}% .${NC}"
+                          exit 1
+                        else
+                          echo -e "${GREEN}  PASSED - Pass rate ${PERCENT}% meets or exceeds threshold ${THRESH}% .${NC}"
+                          exit 0
+                        fi
+                    when:
+                      stageStatus: All
+                  contextType: StageTemplate
+              stepGroupInfra:
+                type: KubernetesDirect
+                spec:
+                  connectorRef: account.central_ci
+                  namespace: harness-delegate-ng
+                  volumes: []
+                  serviceAccountName: ""
+                  nodeSelector:
+                    node_pool: ew2-psv-pre-tool01-svp01-knp01-user
+                  tolerations:
+                    - effect: NoSchedule
+                      key: user-pre
+                      operator: Equal
+                      value: dedicated
+                  harnessImageConnectorRef: account.harness_ci_addon_rtl
+    variables:
+      - name: BUCKET
+        type: String
+        description: GCS bucket name (e.g. my-bucket). Leave blank to skip upload.
+        required: false
+        value: <+input>
+      - name: PROJECT_ID
+        type: String
+        description: GCP project ID (e.g. wrk-pre-wrk01-svp-6aa32f)
+        required: false
+        value: <+input>
+      - name: PATH_TO_UPLOAD
+        type: String
+        description: Path prefix in your bucket where reports will be uploaded
+        required: false
+        value: <+input>
+      - name: GRADLE_VERSION
+        type: String
+        default: 8.14.0-jdk17
+        description: Version of Gradle. Default version - 8.14.0-jdk17. Available versions - 8.14.0-jdk17, 8.14.0-jdk21, 8.14.0-jdk24.
+        required: true
+        value: <+input>.default(8.14.0-jdk17).allowedValues(8.14.0-jdk17,8.14.0-jdk21,8.14.0-jdk24)
+      - name: NEXUS_REGISTRY_VISIBILITY
+        type: String
+        description: Choose the visibility of your package in your T2 Nexus Sonartype Repository (innersource or private.) NOTE - this must have been created within backsatge first.
+        required: true
+        value: <+input>.default(innersource).allowedValues(innersource, private)
+      - name: NEXUS_REGISTRY_VERSION
+        type: String
+        description: Choose the version to push to for your package in your T2 Nexus Sonartype Repository (staging or release). NOTE - this must have been created within backstage first.
+        required: true
+        value: <+input>.default(staging).allowedValues(staging, release)
+      - name: karate_env
+        type: String
+        description: Environment to be passed with gradle (e.g DEV, INT, PRE)
+        required: true
+        value: <+input>.default(INT).allowedValues(INT,PRE,DEV,CDEV)
+      - name: karate_tags
+        type: String
+        description: BDD tags to be passed with gradle. Eg. @acceptance, @smoke, @regression
+        required: true
+        value: <+input>
+      - name: THRESHOLD
+        type: Number
+        description: Pass percentage threshold for BDDs.
+        required: true
+        value: <+input>.default(100)
+      - name: CACHE_FILE_KEY
+        type: String
+        default: build.gradle
+        description: Path of file to be used to calculate Checksum used for Dependency Cache Key. Data stored in the Dependcency cache will be available for retrieval in all future runs for the pipeline identifier.
+        required: true
+        value: <+input>.default(build.gradle)
+      - name: ARTEFACT_CACHE_LOCATION
+        type: String
+        default: build
+        description: Path of the Artefacts to be written to the Artefact Cache. Data stored in the Artefact cache will be available for retrieval only within subsequent Stages in the same pipeline run which generated the artefact.
+        required: true
+        value: <+input>.default(build)
+  icon: data:image/png;base64,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

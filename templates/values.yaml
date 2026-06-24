@@ -1,5 +1,3 @@
 mainImage: nginx:stable
 
 proxyEnabled: true
-
-proxyImage: alpine:3.20

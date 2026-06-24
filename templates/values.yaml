@@ -1,0 +1,5 @@
+mainImage: nginx:stable
+
+proxyEnabled: true
+
+proxyImage: fluent/fluent-bit:latest

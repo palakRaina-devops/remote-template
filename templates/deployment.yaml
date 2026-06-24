@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: multi-container-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: multi-container-demo
+  template:
+    metadata:
+      labels:
+        app: multi-container-demo
+    spec:
+      containers:
+        - name: nginx
+          image: {{ .Values.mainImage | default "nginx:stable" }}
+          ports:
+            - containerPort: 80
+
+        {{- if .Values.proxyEnabled }}
+        - name: proxy-sidecar
+          image: {{ .Values.proxyImage | default "fluent/fluent-bit:latest" }}
+        {{- end }}
